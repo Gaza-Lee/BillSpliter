@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
+﻿using System.ComponentModel;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace BillSpliter.ViewModels
@@ -12,42 +8,57 @@ namespace BillSpliter.ViewModels
     public class MainViewViewModel : INotifyPropertyChanged
     {
         private decimal _bill;
-        private int tip;
-        private int noPersons = 1;
-        private decimal totalTip;
-        private decimal tipByperson;
-        private decimal subtotal;
-        private decimal totalByPerson;
+        private int _tip;
+        private int _noPersons = 1;
+        private decimal _totalTip;
+        private decimal _tipByperson;
+        private decimal _subtotal;
+        private decimal _totalByPerson;
+        private double _tipSliderValue;
         public ICommand IncreasePersonsCommand { get; }
         public ICommand DecreasePersonsCommand { get; }
         public ICommand SetTipCommand { get; }
 
         public MainViewViewModel()
         {
-            SetTipCommand = new Command<int>((tipValue) =>
-            {
-                Console.WriteLine($"Button clicked, changing Tip to {tipValue}");
-                Tip = tipValue;
-                OnPropertyChanged(nameof(Tip));
-                CalculateTotal();
-            });
-            IncreasePersonsCommand = new Command(() =>
-            {
-                NoPersons++;
-                OnPropertyChanged(nameof(NoPersons));
-                CalculateTotal();
-            });
-            DecreasePersonsCommand = new Command(() =>
-            {
-                if (NoPersons > 1)
-                {
-                    NoPersons--;
-                    OnPropertyChanged(nameof(NoPersons));
-                    CalculateTotal();
-                }
-            });
-            Tip = 10;
+            SetTipCommand = new Command<int>(SetTip);
+            IncreasePersonsCommand = new Command(IncreasePersons);
+            DecreasePersonsCommand = new Command(DecreasePersons);
             OnPropertyChanged(nameof(Tip));
+        }
+
+        private void SetTip(int tipValue)
+        {
+            Debug.WriteLine($"Tip update to {tipValue}");
+            Tip = tipValue;
+            OnPropertyChanged(nameof(Tip));
+        }
+
+        private void IncreasePersons()
+        {
+            NoPersons++;
+        }
+        private void DecreasePersons()
+        {
+           if (NoPersons > 1)
+            {
+                NoPersons--;
+            }
+        }
+
+        public double TipSliderValue
+        {
+            get => _tipSliderValue;
+            set
+            {
+                if (_tipSliderValue != value)
+                {
+                    Debug.WriteLine($"Tip updated to {value}");
+                    _tipSliderValue = value;
+                    Tip = (int)value;
+                    OnPropertyChanged();
+                }
+            }
         }
 
         public decimal Bill
@@ -63,13 +74,12 @@ namespace BillSpliter.ViewModels
 
         public int Tip
         {
-            get => tip;
+            get => _tip;
             set
             {
-                if (tip != value)
+                if (_tip != value)
                 {
-                    tip = value;
-                    Console.WriteLine($"Tip updated to: {tip}");
+                    _tip = value;
                     OnPropertyChanged(nameof(Tip));
                     CalculateTotal();
                 }
@@ -78,12 +88,12 @@ namespace BillSpliter.ViewModels
 
         public int NoPersons
         {
-            get => noPersons;
+            get => _noPersons;
             set
             {
-                if (noPersons != value)
+                if (_noPersons != value && _noPersons > 0)
                 {
-                    noPersons = value;
+                    _noPersons = value;
                     OnPropertyChanged();
                     CalculateTotal();
                 }
@@ -92,40 +102,40 @@ namespace BillSpliter.ViewModels
 
         public decimal TotalTip
         {
-            get => totalTip;
+            get => _totalTip;
             set
             {
-                totalTip = value;
+                _totalTip = value;
                 OnPropertyChanged(nameof(TotalTip));
             }
         }
 
         public decimal TipByperson
         {
-            get => tipByperson;
+            get => _tipByperson;
             private set
             {
-                tipByperson = value;
+                _tipByperson = value;
                 OnPropertyChanged(nameof(TipByperson));
             }
         }
 
         public decimal Subtotal
         {
-            get => subtotal;
+            get => _subtotal;
             private set
             {
-                subtotal = value;
+                _subtotal = value;
                 OnPropertyChanged(nameof(Subtotal));
             }
         }
 
         public decimal TotalByPerson
         {
-            get => totalByPerson;
+            get => _totalByPerson;
             private set
             {
-                totalByPerson = value;
+                _totalByPerson = value;
                 OnPropertyChanged(nameof(TotalByPerson));
             }
         }
@@ -134,7 +144,7 @@ namespace BillSpliter.ViewModels
         {
             TotalTip = (Bill * Tip) / 100;
             TipByperson = TotalTip / NoPersons;
-            Subtotal = Bill/NoPersons;
+            Subtotal = Bill / NoPersons;
             TotalByPerson = (Bill + TotalTip) / NoPersons;
         }
 
