@@ -17,19 +17,37 @@ namespace BillSpliter.ViewModels
         private decimal totalTip;
         private decimal tipByperson;
         private decimal subtotal;
-        private decimal totalbyPerson;
-        private ICommand IncreasePersonsCommand { get; }
-        private ICommand DecreasePersonsCommand { get; }
+        private decimal totalByPerson;
+        public ICommand IncreasePersonsCommand { get; }
+        public ICommand DecreasePersonsCommand { get; }
         public ICommand SetTipCommand { get; }
 
         public MainViewViewModel()
         {
-            SetTipCommand = new Command<int>((tipValue) => Tip = tipValue);
-            IncreasePersonsCommand = new Command(() => NoPersons++);
+            SetTipCommand = new Command<int>((tipValue) =>
+            {
+                Console.WriteLine($"Button clicked, changing Tip to {tipValue}");
+                Tip = tipValue;
+                OnPropertyChanged(nameof(Tip));
+                CalculateTotal();
+            });
+            IncreasePersonsCommand = new Command(() =>
+            {
+                NoPersons++;
+                OnPropertyChanged(nameof(NoPersons));
+                CalculateTotal();
+            });
             DecreasePersonsCommand = new Command(() =>
             {
-                if (NoPersons > 1) NoPersons--;
+                if (NoPersons > 1)
+                {
+                    NoPersons--;
+                    OnPropertyChanged(nameof(NoPersons));
+                    CalculateTotal();
+                }
             });
+            Tip = 10;
+            OnPropertyChanged(nameof(Tip));
         }
 
         public decimal Bill
@@ -48,9 +66,13 @@ namespace BillSpliter.ViewModels
             get => tip;
             set
             {
-                tip = value;
-                OnPropertyChanged();
-                CalculateTotal();
+                if (tip != value)
+                {
+                    tip = value;
+                    Console.WriteLine($"Tip updated to: {tip}");
+                    OnPropertyChanged(nameof(Tip));
+                    CalculateTotal();
+                }
             }
         }
 
@@ -59,7 +81,7 @@ namespace BillSpliter.ViewModels
             get => noPersons;
             set
             {
-                if (value >= 1)
+                if (noPersons != value)
                 {
                     noPersons = value;
                     OnPropertyChanged();
@@ -74,7 +96,7 @@ namespace BillSpliter.ViewModels
             set
             {
                 totalTip = value;
-                OnPropertyChanged();
+                OnPropertyChanged(nameof(TotalTip));
             }
         }
 
@@ -84,7 +106,7 @@ namespace BillSpliter.ViewModels
             private set
             {
                 tipByperson = value;
-                OnPropertyChanged();
+                OnPropertyChanged(nameof(TipByperson));
             }
         }
 
@@ -94,17 +116,17 @@ namespace BillSpliter.ViewModels
             private set
             {
                 subtotal = value;
-                OnPropertyChanged();
+                OnPropertyChanged(nameof(Subtotal));
             }
         }
 
-        private decimal TotalByPerson
+        public decimal TotalByPerson
         {
-            get => totalbyPerson;
-            set
+            get => totalByPerson;
+            private set
             {
-                totalbyPerson = value;
-                OnPropertyChanged();
+                totalByPerson = value;
+                OnPropertyChanged(nameof(TotalByPerson));
             }
         }
 

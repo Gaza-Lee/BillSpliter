@@ -56,7 +56,7 @@
                            FontSize="50"
                            FontAttributes="Bold"
                            HorizontalTextAlignment="Center"
-                           Text="{Binding TotalTip}"
+                           Text="{Binding TotalByPerson}"
                            TextColor="{StaticResource LightFont}"
                            x:Name="lblTotal"/>
                 </VerticalStackLayout>
@@ -146,7 +146,7 @@
                    Grid.Column="0"
                    Text="{Binding Tip, StringFormat='Tip: {0}%'}"
                    Style="{StaticResource dataLabel}"/>
-            <Slider x:Name="sldTip"
+            <Slider 
                     Grid.Column="1"
                     Grid.Row="2"
                     Maximum="50"
@@ -164,7 +164,7 @@
                 <Button x:Name="btnMinus"
                         Text="-"
                         Style="{StaticResource dataButton}"
-                        Command="{Binding IncreasePersons}"/>
+                        Command="{Binding DecreasePersonsCommand}"/>
                 <Label 
                        Margin="-5,0"
                        BackgroundColor="{StaticResource SectionColor}"
@@ -180,7 +180,7 @@
                 <Button Style="{StaticResource dataButton}"
                         Text="+"
                         x:Name="btnPlus"
-                        Command="{Binding DecreasePersonsCommand}"/>
+                        Command="{Binding IncreasePersonsCommand}"/>
             </HorizontalStackLayout>
         </Grid>
         
